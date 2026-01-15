@@ -37,7 +37,7 @@ export const MemberList: React.FC = () => {
   };
 
   const captureFace = () => {
-    if (videoRef.current && canvasRef.current && capturedImages.length < 3) {
+    if (videoRef.current && canvasRef.current && capturedImages.length < 1) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       canvas.width = 480;
@@ -48,7 +48,7 @@ export const MemberList: React.FC = () => {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImages(prev => [...prev, dataUrl]);
         
-        if (capturedImages.length === 2) {
+        if (capturedImages.length === 0) {
             stopCamera();
         }
       }
@@ -264,9 +264,9 @@ export const MemberList: React.FC = () => {
                     <div className="flex items-end">
                        <button 
                         type="submit" 
-                        disabled={isCapturing || capturedImages.length < 3}
+                        disabled={isCapturing || capturedImages.length < 1}
                         className={`w-full py-5 rounded-[28px] font-black text-white transition-all shadow-2xl
-                          ${isCapturing || capturedImages.length < 3 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-black shadow-slate-900/30 active:scale-95'}
+                          ${isCapturing || capturedImages.length < 1 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-black shadow-slate-900/30 active:scale-95'}
                         `}
                       >
                         CREATE ACCOUNT
@@ -303,20 +303,19 @@ export const MemberList: React.FC = () => {
                      </button>
                    </>
                  ) : (
-                   <div className="text-center p-8 flex flex-col items-center">
-                      <div className="flex space-x-4 mb-12">
-                        {[0, 1, 2].map(i => (
-                            <div key={i} className={`w-20 h-24 rounded-3xl border-2 transition-all duration-700 overflow-hidden flex items-center justify-center ${capturedImages[i] ? 'border-blue-500 bg-blue-500/20' : 'border-white/10 bg-white/5 opacity-40'}`}>
-                                {capturedImages[i] ? (
-                                    <img src={capturedImages[i]} className="w-full h-full object-cover animate-in zoom-in duration-500" />
-                                ) : (
-                                    <span className="text-sm font-black text-slate-600">{i+1}</span>
-                                )}
-                            </div>
-                        ))}
-                      </div>
-                      <button 
-                         type="button"
+                                      <div className="text-center p-8 flex flex-col items-center">
+                                         <div className="flex space-x-4 mb-12">
+                                           {[0].map(i => (
+                                               <div key={i} className={`w-32 h-40 rounded-3xl border-2 transition-all duration-700 overflow-hidden flex items-center justify-center ${capturedImages[i] ? 'border-blue-500 bg-blue-500/20' : 'border-white/10 bg-white/5 opacity-40'}`}>
+                                                   {capturedImages[i] ? (
+                                                       <img src={capturedImages[i]} className="w-full h-full object-cover animate-in zoom-in duration-500" />
+                                                   ) : (
+                                                       <span className="text-sm font-black text-slate-600">PHOTO</span>
+                                                   )}
+                                               </div>
+                                           ))}
+                                         </div>
+                                         <button                           type="button"
                          onClick={() => { setCapturedImages([]); startFaceRegistration(); }}
                          className="bg-blue-600 hover:bg-blue-500 text-white px-12 py-5 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-2xl shadow-blue-600/30 active:scale-95"
                       >
@@ -329,7 +328,7 @@ export const MemberList: React.FC = () => {
               <div className="mt-10 bg-white/5 p-6 rounded-[32px] border border-white/10">
                 <p className="text-[11px] text-slate-400 font-bold leading-relaxed uppercase tracking-widest">
                   <i className="fas fa-lightbulb mr-2 text-blue-400"></i>
-                  정면, 약간의 좌/우 각도를 각각 촬영하여 인식률을 높여주세요 (최소 3장).
+                  정면 사진을 선명하게 촬영해주세요.
                 </p>
               </div>
               <canvas ref={canvasRef} className="hidden" />

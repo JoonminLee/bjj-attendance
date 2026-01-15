@@ -16,8 +16,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, role }) => {
 
   const adminNav = [
     { name: '대시보드', path: '/admin', icon: 'fa-chart-pie' },
-    { name: '회원 관리', path: '/admin/members', icon: 'fa-users-gear' },
-    { name: '출결 기록', path: '/admin/attendance', icon: 'fa-clipboard-list' },
+    { name: '회원관리', path: '/admin/members', icon: 'fa-users-gear' },
+    { name: '출결기록', path: '/admin/attendance', icon: 'fa-clipboard-list' },
   ];
 
   const handleLogout = () => {
@@ -38,7 +38,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, role }) => {
           </div>
           <h1 className="text-lg font-black italic tracking-tighter">OSS JIU-JITSU</h1>
         </div>
-        <button 
+        <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 active:scale-90 transition-transform"
         >
@@ -47,7 +47,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, role }) => {
       </header>
 
       {/* Mobile Menu Overlay */}
-      <div 
+      <div
         className={`fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
@@ -68,17 +68,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, role }) => {
           </div>
           <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Management System</p>
         </div>
-        
+
         <nav className="flex-1 px-4 space-y-1.5 mt-4">
           {role === 'admin' && adminNav.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-200 group ${
-                isActive(item.path) 
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
+              className={`flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-200 group ${isActive(item.path)
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                 : 'text-slate-400 hover:bg-white/5 hover:text-white'
-              }`}
+                }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <i className={`fas ${item.icon} text-lg ${isActive(item.path) ? 'text-white' : 'group-hover:text-blue-400'}`}></i>

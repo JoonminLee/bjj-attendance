@@ -63,16 +63,7 @@ export const Kiosk: React.FC = () => {
     setStatus('detecting');
     setDetectionStep(0);
     
-    const steps = [
-      { step: 1, delay: 600 },
-      { step: 2, delay: 1200 },
-      { step: 3, delay: 1800 }
-    ];
-
-    steps.forEach(({ step, delay }) => {
-      setTimeout(() => setDetectionStep(step), delay);
-    });
-    
+    // Simulating face detection process
     setTimeout(() => {
       const members = storageService.getMembers().filter(m => m.status === 'active' && m.faceImages && m.faceImages.length > 0);
       const isSuccess = members.length > 0 && Math.random() > 0.3;
@@ -85,7 +76,7 @@ export const Kiosk: React.FC = () => {
         setMessage('얼굴 인식 실패. 번호 입력을 사용해 주세요.');
         setTimeout(() => setStatus('idle'), 3000);
       }
-    }, 2200);
+    }, 1500);
   };
 
   const executeCheckIn = (memberId: string) => {
@@ -194,17 +185,9 @@ export const Kiosk: React.FC = () => {
               )}
 
               {status === 'detecting' && (
-                <div className="space-y-4 w-full px-12">
-                   {[1, 2, 3].map(i => (
-                     <div key={i} className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-300 ${detectionStep >= i ? 'bg-blue-500/20 border-blue-400/50' : 'bg-white/5 border-white/10 opacity-30'}`}>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Sample Data #{i}</span>
-                        {detectionStep >= i ? (
-                          <i className="fas fa-check-circle text-blue-400 animate-in zoom-in"></i>
-                        ) : (
-                          <div className="w-3 h-3 rounded-full border border-white/20"></div>
-                        )}
-                     </div>
-                   ))}
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                    <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="mt-6 text-sm font-black uppercase tracking-widest text-blue-400 animate-pulse">Scanning...</p>
                 </div>
               )}
             </div>

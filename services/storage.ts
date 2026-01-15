@@ -8,13 +8,13 @@ const KEYS = {
 };
 
 const INITIAL_MEMBERS: Member[] = [
-  { 
-    id: '1', 
-    name: '김철수', 
-    phone: '010-1234-5678', 
-    joinDate: '2023-10-01', 
-    totalTickets: 20, 
-    remainingTickets: 12, 
+  {
+    id: '1',
+    name: '김철수',
+    phone: '010-1234-5678',
+    joinDate: '2023-10-01',
+    totalTickets: 20,
+    remainingTickets: 12,
     status: 'active',
     faceImages: []
   }
@@ -62,7 +62,7 @@ export const storageService = {
   addAttendance: (memberId: string) => {
     const members = storageService.getMembers();
     const member = members.find(m => m.id === memberId);
-    
+
     if (!member) throw new Error('회원을 찾을 수 없습니다.');
     if (member.remainingTickets <= 0) throw new Error('수강권이 부족합니다.');
 
