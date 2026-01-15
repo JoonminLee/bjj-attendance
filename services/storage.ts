@@ -56,9 +56,9 @@ export const storageService = {
     const initialBelt = (member as any).belt || 'White';
     const initialStripes = (member as any).stripes || 0;
 
-    const newMember: Member = { 
-      ...member, 
-      id: Date.now().toString(), 
+    const newMember: Member = {
+      ...member,
+      id: Date.now().toString(),
       joinDate,
       belt: initialBelt,
       stripes: initialStripes,
@@ -93,7 +93,22 @@ export const storageService = {
     if (!member) throw new Error('회원을 찾을 수 없습니다.');
     if (member.remainingTickets <= 0) throw new Error('수강권이 부족합니다.');
 
-    const updatedMember = { ...member, remainingTickets: member.remainingTickets - 1 };
+    const newBalance = member.remainingTickets - 1;
+    const updatedMember: Member = {
+      ...member,
+      remainingTickets: newBalance,
+      ticketHistory: [
+        ...(member.ticketHistory || []),
+        {
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: 'use',
+          amount: 1,
+          balance: newBalance,
+          note: '출석 체크'
+        }
+      ]
+    };
     storageService.updateMember(updatedMember);
 
     const attendance = storageService.getAttendance();
@@ -120,5 +135,90 @@ export const storageService = {
     const id = localStorage.getItem(KEYS.CURRENT_MEMBER_ID);
     if (!id) return null;
     return storageService.getMembers().find(m => m.id === id) || null;
+  },
+
+  // 출결 기록 삭제 (수강권 복구 포함)
+  deleteAttendance: (attendanceId: string, refundTicket: boolean = true) => {
+    const attendance = storageService.getAttendance();
+    const record = attendance.find(a => a.id === attendanceId);
+
+    if (!record) throw new Error('출결 기록을 찾을 수 없습니다.');
+
+    // 수강권 복구
+    if (refundTicket) {
+      const members = storageService.getMembers();
+      const member = members.find(m => m.id === record.memberId);
+      if (member) {
+        const updatedMember: Member = {
+          ...member,
+          remainingTickets: member.remainingTickets + 1,
+          ticketHistory: [
+            ...(member.ticketHistory || []),
+            {
+              id: Date.now().toString(),
+              date: new Date().toISOString(),
+              type: 'refund',
+              amount: 1,
+              balance: member.remainingTickets + 1,
+              note: `출결 취소로 인한 복구 (${new Date(record.timestamp).toLocaleDateString()})`
+            }
+          ]
+        };
+        storageService.updateMember(updatedMember);
+      }
+    }
+
+    // 출결 기록 삭제
+    const updatedAttendance = attendance.filter(a => a.id !== attendanceId);
+    localStorage.setItem(KEYS.ATTENDANCE, JSON.stringify(updatedAttendance));
+    return { deleted: record };
+  },
+
+  // 회원 완전 삭제
+  deleteMember: (memberId: string) => {
+    const members = storageService.getMembers();
+    const member = members.find(m => m.id === memberId);
+
+    if (!member) throw new Error('회원을 찾을 수 없습니다.');
+
+    // 해당 회원의 출결 기록도 함께 삭제
+    const attendance = storageService.getAttendance();
+    const updatedAttendance = attendance.filter(a => a.memberId !== memberId);
+    localStorage.setItem(KEYS.ATTENDANCE, JSON.stringify(updatedAttendance));
+
+    // 회원 삭제
+    const updatedMembers = members.filter(m => m.id !== memberId);
+    storageService.saveMembers(updatedMembers);
+
+    return { deleted: member };
+  },
+
+  // 수강권 충전
+  addTickets: (memberId: string, amount: number, note?: string) => {
+    const members = storageService.getMembers();
+    const member = members.find(m => m.id === memberId);
+
+    if (!member) throw new Error('회원을 찾을 수 없습니다.');
+
+    const newBalance = member.remainingTickets + amount;
+    const updatedMember: Member = {
+      ...member,
+      remainingTickets: newBalance,
+      totalTickets: member.totalTickets + amount,
+      ticketHistory: [
+        ...(member.ticketHistory || []),
+        {
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: 'add',
+          amount,
+          balance: newBalance,
+          note: note || `수강권 ${amount}회 충전`
+        }
+      ]
+    };
+
+    storageService.updateMember(updatedMember);
+    return { member: updatedMember };
   }
 };

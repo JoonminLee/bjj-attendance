@@ -11,7 +11,7 @@ export const MemberList: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'history' | 'notes'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'history' | 'tickets' | 'notes'>('info');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
 
   // Camera
@@ -239,6 +239,44 @@ export const MemberList: React.FC = () => {
     setMembers(updated);
   };
 
+  // 회원 삭제
+  const [deleteModal, setDeleteModal] = useState<{ open: boolean; member: Member | null }>({ open: false, member: null });
+
+  const handleDeleteMember = () => {
+    if (!deleteModal.member) return;
+    try {
+      storageService.deleteMember(deleteModal.member.id);
+      setMembers(storageService.getMembers());
+      setDeleteModal({ open: false, member: null });
+      closeEditModal();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  // 수강권 충전
+  const [ticketModal, setTicketModal] = useState<{ open: boolean; member: Member | null }>({ open: false, member: null });
+  const [ticketAmount, setTicketAmount] = useState(10);
+  const [ticketNote, setTicketNote] = useState('');
+
+  const handleAddTickets = () => {
+    if (!ticketModal.member || ticketAmount <= 0) return;
+    try {
+      const result = storageService.addTickets(ticketModal.member.id, ticketAmount, ticketNote || undefined);
+      setMembers(storageService.getMembers());
+      if (editingMember && editingMember.id === ticketModal.member.id) {
+        setEditingMember(result.member);
+        setEditFormData(prev => ({ ...prev, tickets: result.member.remainingTickets }));
+      }
+      setTicketModal({ open: false, member: null });
+      setTicketAmount(10);
+      setTicketNote('');
+      handleSaveFeedback();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const openEditModal = (member: Member) => {
     setEditingMember(member);
     setEditFormData({
@@ -327,9 +365,10 @@ export const MemberList: React.FC = () => {
           </div>
         </div>
 
-        {/* Member Table */}
-        <div className="overflow-x-auto min-w-full">
-          <table className="w-full text-left min-w-[800px]">
+        {/* Member List - Responsive Design */}
+        <div className="overflow-hidden min-w-full">
+          {/* Desktop Table Header */}
+          <table className="w-full text-left hidden md:table">
             <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr>
                 <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Profile Info</th>
@@ -362,31 +401,28 @@ export const MemberList: React.FC = () => {
                         <span className="mr-1">{member.belt || 'White'}</span>
                         {member.stripes > 0 && <span className="text-[9px] opacity-70"> • {member.stripes} Stripes</span>}
                       </div>
-                      <span className="text-xs font-bold text-slate-500">Tickets: {member.remainingTickets}</span>
+                      <div className="flex items-center space-x-2">
+                        <i className="fas fa-ticket text-[10px] text-slate-300"></i>
+                        <span className="text-xs font-bold text-slate-500">{member.remainingTickets} Left</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-6">
-                    <span className={`inline-flex items-center px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest ${member.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                      }`}>
+                    <span className={`inline-flex items-center px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest ${member.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                       <span className={`w-1.5 h-1.5 rounded-full mr-2 ${member.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
                       {member.status === 'active' ? 'Active' : 'Suspended'}
                     </span>
                   </td>
                   <td className="px-10 py-6 text-right">
                     <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => openEditModal(member)}
-                        className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white transition-all active:scale-90 flex items-center justify-center"
-                        title="Edit Member"
-                      >
+                      <button onClick={() => openEditModal(member)} className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-900 hover:text-white transition-all active:scale-90 flex items-center justify-center shadow-sm" title="Edit Member">
                         <i className="fas fa-edit"></i>
                       </button>
-                      <button
-                        onClick={() => handleToggleStatus(member.id)}
-                        className={`w-10 h-10 rounded-xl transition-all active:scale-90 flex items-center justify-center ${member.status === 'active' ? 'bg-slate-50 text-slate-400 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'}`}
-                        title={member.status === 'active' ? 'Suspend' : 'Activate'}
-                      >
+                      <button onClick={() => handleToggleStatus(member.id)} className={`w-10 h-10 rounded-xl transition-all active:scale-90 flex items-center justify-center shadow-sm ${member.status === 'active' ? 'bg-slate-50 text-slate-400 hover:bg-orange-500 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'}`} title={member.status === 'active' ? 'Suspend' : 'Activate'}>
                         <i className={`fas ${member.status === 'active' ? 'fa-ban' : 'fa-check'}`}></i>
+                      </button>
+                      <button onClick={() => setDeleteModal({ open: true, member })} className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-red-500 hover:text-white transition-all active:scale-90 flex items-center justify-center shadow-sm" title="Delete Member">
+                        <i className="fas fa-trash-alt"></i>
                       </button>
                     </div>
                   </td>
@@ -394,12 +430,48 @@ export const MemberList: React.FC = () => {
               ))}
             </tbody>
           </table>
-          {filteredMembers.length === 0 && (
-            <div className="py-40 text-center flex flex-col items-center">
-              <div className="w-24 h-24 bg-slate-50 rounded-[40px] flex items-center justify-center mb-6 text-slate-200 text-5xl">
-                <i className="fas fa-fingerprint"></i>
+
+          {/* Mobile Card Layout */}
+          <div className="grid grid-cols-1 gap-4 p-6 md:hidden">
+            {filteredMembers.map((member) => (
+              <div key={member.id} className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100 hover:border-slate-300 transition-all active:scale-[0.98] group" onClick={() => openEditModal(member)}>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 overflow-hidden">
+                      {member.faceImages.length > 0 ? (
+                        <img src={member.faceImages[0]} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300"><i className="fas fa-user"></i></div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-black text-slate-900 leading-tight">{member.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{member.phone}</p>
+                    </div>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${member.status === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'}`}>
+                    {member.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-200/50">
+                  <div className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${getBeltColorClass(member.belt || 'White')}`}>
+                    {member.belt} • {member.stripes} S
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <i className="fas fa-ticket text-[10px] text-slate-300"></i>
+                    <span className="text-xs font-black text-slate-700">{member.remainingTickets}</span>
+                  </div>
+                </div>
               </div>
-              <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No records found matching your search</p>
+            ))}
+          </div>
+
+          {filteredMembers.length === 0 && (
+            <div className="py-24 text-center flex flex-col items-center">
+              <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mb-6 text-slate-200 text-4xl">
+                <i className="fas fa-search"></i>
+              </div>
+              <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No records found</p>
             </div>
           )}
         </div>
@@ -504,16 +576,17 @@ export const MemberList: React.FC = () => {
 
             {/* Tabs */}
             <div className="flex border-b border-slate-100 px-10">
-              {(['info', 'history', 'notes'] as const).map(tab => (
+              {(['info', 'history', 'tickets', 'notes'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-4 text-xs font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === tab ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
                 >
                   {tab === 'info' && <i className="fas fa-user mr-2"></i>}
-                  {tab === 'history' && <i className="fas fa-history mr-2"></i>}
+                  {tab === 'history' && <i className="fas fa-medal mr-2"></i>}
+                  {tab === 'tickets' && <i className="fas fa-ticket-alt mr-2"></i>}
                   {tab === 'notes' && <i className="fas fa-sticky-note mr-2"></i>}
-                  {tab}
+                  {tab === 'history' ? 'Belt' : tab}
                 </button>
               ))}
             </div>
@@ -572,7 +645,16 @@ export const MemberList: React.FC = () => {
 
                     {/* Tickets */}
                     <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100">
-                      <h4 className="text-sm font-black text-slate-900 mb-6 uppercase tracking-widest"><i className="fas fa-ticket-alt mr-2 text-emerald-500"></i>Membership</h4>
+                      <div className="flex justify-between items-center mb-6">
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest"><i className="fas fa-ticket-alt mr-2 text-emerald-500"></i>Membership</h4>
+                        <button
+                          type="button"
+                          onClick={() => setTicketModal({ open: true, member: editingMember })}
+                          className="text-[10px] font-black uppercase text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full hover:bg-emerald-100 transition-colors"
+                        >
+                          <i className="fas fa-plus mr-1"></i> 수강권 충전
+                        </button>
+                      </div>
                       <div>
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Remaining Tickets</label>
                         <div className="flex items-center space-x-4">
@@ -580,6 +662,23 @@ export const MemberList: React.FC = () => {
                           <input type="number" value={editFormData.tickets} onChange={e => setEditFormData({ ...editFormData, tickets: parseInt(e.target.value) })} className="flex-1 px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50/50 font-black text-center text-2xl" />
                           <button type="button" onClick={() => setEditFormData(prev => ({ ...prev, tickets: prev.tickets + 1 }))} className="w-12 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black">+</button>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Danger Zone */}
+                    <div className="bg-red-50 p-6 rounded-[24px] border border-red-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-black text-red-900 text-sm">위험 구역</p>
+                          <p className="text-xs text-red-400">회원 정보와 모든 출결 기록이 영구 삭제됩니다</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteModal({ open: true, member: editingMember })}
+                          className="px-5 py-3 bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-colors"
+                        >
+                          <i className="fas fa-trash-alt mr-2"></i>회원 삭제
+                        </button>
                       </div>
                     </div>
 
@@ -637,6 +736,85 @@ export const MemberList: React.FC = () => {
                 </div>
               )}
 
+              {/* TICKETS TAB */}
+              {activeTab === 'tickets' && (
+                <div className="h-full flex flex-col p-6 overflow-hidden">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h4 className="text-lg font-black text-slate-900 italic">Ticket History</h4>
+                      <p className="text-xs text-slate-500 mt-1">수강권 충전 및 사용 내역</p>
+                    </div>
+                    <button
+                      onClick={() => setTicketModal({ open: true, member: editingMember })}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                    >
+                      <i className="fas fa-plus mr-2"></i>충전하기
+                    </button>
+                  </div>
+
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100">
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">잔여</p>
+                      <p className="text-3xl font-black text-slate-900 italic">{editingMember?.remainingTickets || 0}<span className="text-sm not-italic text-slate-400 ml-1">회</span></p>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100">
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">총 충전</p>
+                      <p className="text-3xl font-black text-emerald-600 italic">{editingMember?.totalTickets || 0}<span className="text-sm not-italic text-slate-400 ml-1">회</span></p>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100">
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">사용</p>
+                      <p className="text-3xl font-black text-blue-600 italic">{(editingMember?.totalTickets || 0) - (editingMember?.remainingTickets || 0)}<span className="text-sm not-italic text-slate-400 ml-1">회</span></p>
+                    </div>
+                  </div>
+
+                  {/* History List */}
+                  <div className="flex-1 bg-white rounded-[32px] border border-slate-100 p-6 overflow-y-auto custom-scrollbar">
+                    <div className="space-y-4">
+                      {editingMember?.ticketHistory && editingMember.ticketHistory.length > 0 ? (
+                        [...editingMember.ticketHistory].reverse().map((h, idx) => (
+                          <div key={h.id || idx} className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-slate-50">
+                            <div className="flex items-center space-x-4">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm ${h.type === 'add' ? 'bg-emerald-100 text-emerald-600' :
+                                h.type === 'refund' ? 'bg-blue-100 text-blue-600' :
+                                  'bg-slate-100 text-slate-600'
+                                }`}>
+                                <i className={`fas ${h.type === 'add' ? 'fa-plus' : h.type === 'refund' ? 'fa-undo' : 'fa-minus'}`}></i>
+                              </div>
+                              <div>
+                                <p className="font-black text-slate-900">
+                                  {h.type === 'add' && '수강권 충전'}
+                                  {h.type === 'use' && '수강권 사용'}
+                                  {h.type === 'refund' && '수강권 환불'}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {new Date(h.date).toLocaleDateString()} {new Date(h.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {h.note && <span className="ml-2 text-slate-400">• {h.note}</span>}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-xl font-black ${h.type === 'use' ? 'text-red-500' : 'text-emerald-500'}`}>
+                                {h.type === 'use' ? '-' : '+'}{h.amount}
+                              </p>
+                              <p className="text-xs text-slate-400">잔액: {h.balance}회</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-20">
+                          <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4 text-slate-200 text-2xl">
+                            <i className="fas fa-receipt"></i>
+                          </div>
+                          <p className="text-slate-400 font-bold text-sm">수강권 변경 내역이 없습니다</p>
+                          <p className="text-slate-300 text-xs mt-1">충전하면 여기에 표시됩니다</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* NOTES TAB */}
               {activeTab === 'notes' && (
                 <div className="h-full p-10 flex flex-col">
@@ -664,6 +842,131 @@ export const MemberList: React.FC = () => {
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
       `}</style>
+
+      {/* Delete Member Confirmation Modal */}
+      {deleteModal.open && deleteModal.member && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl p-10 animate-in zoom-in-95 duration-200">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-red-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-red-500 text-2xl">
+                <i className="fas fa-user-slash"></i>
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 italic mb-2">회원 삭제</h3>
+              <p className="text-slate-500 text-sm">
+                <span className="font-black text-slate-900">{deleteModal.member.name}</span>님을<br />
+                정말로 삭제하시겠습니까?
+              </p>
+            </div>
+
+            <div className="bg-red-50 rounded-2xl p-5 mb-8 border border-red-100">
+              <div className="flex items-start space-x-3">
+                <i className="fas fa-exclamation-triangle text-red-400 mt-0.5"></i>
+                <div>
+                  <p className="font-bold text-red-900 text-sm">이 작업은 되돌릴 수 없습니다</p>
+                  <p className="text-xs text-red-500 mt-1">회원 정보, 얼굴 데이터, 모든 출결 기록이 영구적으로 삭제됩니다.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setDeleteModal({ open: false, member: null })}
+                className="flex-1 py-4 rounded-2xl font-black text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeleteMember}
+                className="flex-1 py-4 rounded-2xl font-black text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+              >
+                <i className="fas fa-trash-alt mr-2"></i>삭제하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ticket Recharge Modal */}
+      {ticketModal.open && ticketModal.member && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl p-10 animate-in zoom-in-95 duration-200">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-500 text-2xl">
+                <i className="fas fa-ticket-alt"></i>
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 italic mb-2">수강권 충전</h3>
+              <p className="text-slate-500 text-sm">
+                <span className="font-black text-slate-900">{ticketModal.member.name}</span>님에게<br />
+                수강권을 충전합니다
+              </p>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">충전 횟수</label>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setTicketAmount(prev => Math.max(1, prev - 1))}
+                    className="w-14 h-14 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xl"
+                  >-</button>
+                  <input
+                    type="number"
+                    value={ticketAmount}
+                    onChange={e => setTicketAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="flex-1 px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 font-black text-center text-3xl"
+                    min="1"
+                  />
+                  <button
+                    onClick={() => setTicketAmount(prev => prev + 1)}
+                    className="w-14 h-14 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xl"
+                  >+</button>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                {[10, 20, 30, 50].map(preset => (
+                  <button
+                    key={preset}
+                    onClick={() => setTicketAmount(preset)}
+                    className={`flex-1 py-3 rounded-xl font-bold text-sm transition-colors ${ticketAmount === preset ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    {preset}회
+                  </button>
+                ))}
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">메모 (선택)</label>
+                <input
+                  type="text"
+                  value={ticketNote}
+                  onChange={e => setTicketNote(e.target.value)}
+                  placeholder="예: 1개월 정기권 결제"
+                  className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 font-medium"
+                />
+              </div>
+            </div>
+
+            <div className="bg-emerald-50 rounded-2xl p-5 mb-8 flex justify-between items-center">
+              <span className="text-sm font-bold text-slate-600">현재 잔액</span>
+              <span className="text-lg font-black text-slate-900">{ticketModal.member.remainingTickets}회 → <span className="text-emerald-600">{ticketModal.member.remainingTickets + ticketAmount}회</span></span>
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                onClick={() => { setTicketModal({ open: false, member: null }); setTicketAmount(10); setTicketNote(''); }}
+                className="flex-1 py-4 rounded-2xl font-black text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleAddTickets}
+                className="flex-1 py-4 rounded-2xl font-black text-white bg-emerald-500 hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+              >
+                <i className="fas fa-plus mr-2"></i>충전하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

@@ -23,6 +23,7 @@ export interface Member {
   address?: string;
   memo?: string; // Admin private notes
   faceImages: string[]; // Array of base64 strings for better recognition
+  ticketHistory?: TicketHistory[]; // 수강권 변경 이력
 }
 
 export interface AttendanceRecord {
@@ -31,6 +32,15 @@ export interface AttendanceRecord {
   memberName: string;
   timestamp: string;
   type: 'check-in';
+}
+
+export interface TicketHistory {
+  id: string;
+  date: string;
+  type: 'add' | 'use' | 'refund';
+  amount: number;
+  balance: number; // 변경 후 잔액
+  note?: string;
 }
 
 export type UserRole = 'admin' | 'kiosk' | 'member' | null;

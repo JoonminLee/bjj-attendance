@@ -64,11 +64,11 @@ export const MyProfile: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 pb-20">
         <div className="w-full max-w-md">
           <div className="text-center mb-10">
-             <div className="w-20 h-20 bg-emerald-600 rounded-3xl flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-lg shadow-emerald-500/20">
-               <i className="fas fa-user-check"></i>
-             </div>
-             <h2 className="text-3xl font-black italic tracking-tighter">MEMBER ACCESS</h2>
-             <p className="text-slate-500 font-medium text-sm mt-1 uppercase tracking-widest">내 정보를 조회하세요</p>
+            <div className="w-20 h-20 bg-emerald-600 rounded-3xl flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+              <i className="fas fa-user-check"></i>
+            </div>
+            <h2 className="text-3xl font-black italic tracking-tighter">MEMBER ACCESS</h2>
+            <p className="text-slate-500 font-medium text-sm mt-1 uppercase tracking-widest">내 정보를 조회하세요</p>
           </div>
 
           <div className="bg-white rounded-[40px] shadow-xl p-8 border border-slate-100">
@@ -80,7 +80,7 @@ export const MyProfile: React.FC = () => {
                 </div>
                 <div className="space-y-3 mb-6 max-h-[250px] overflow-y-auto px-1 custom-scrollbar">
                   {multipleMatches.map(m => (
-                    <button 
+                    <button
                       key={m.id}
                       onClick={() => completeLogin(m)}
                       className="w-full p-5 bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-200 rounded-2xl flex items-center justify-between group transition-all"
@@ -90,15 +90,15 @@ export const MyProfile: React.FC = () => {
                           {m.name[0]}
                         </div>
                         <div className="text-left">
-                           <p className="font-black text-slate-900">{m.name}</p>
-                           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Joined: {m.joinDate}</p>
+                          <p className="font-black text-slate-900">{m.name}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Joined: {m.joinDate}</p>
                         </div>
                       </div>
                       <i className="fas fa-chevron-right text-slate-200 group-hover:text-emerald-400 transition-colors"></i>
                     </button>
                   ))}
                 </div>
-                <button 
+                <button
                   onClick={() => handleAction('CLR')}
                   className="w-full py-4 text-slate-400 text-xs font-black uppercase tracking-widest hover:text-slate-900"
                 >
@@ -109,11 +109,11 @@ export const MyProfile: React.FC = () => {
               <>
                 <div className="flex justify-center space-x-3 mb-8">
                   {[0, 1, 2, 3].map(i => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       className={`w-14 h-20 rounded-2xl border-2 flex items-center justify-center text-4xl font-black transition-all duration-200 
-                        ${phoneSuffix[i] 
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-900 shadow-lg shadow-emerald-500/10 scale-105' 
+                        ${phoneSuffix[i]
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-900 shadow-lg shadow-emerald-500/10 scale-105'
                           : 'border-slate-100 bg-slate-50 text-transparent'
                         }`}
                     >
@@ -136,8 +136,8 @@ export const MyProfile: React.FC = () => {
                         else handleKeyPress(key);
                       }}
                       className={`h-16 md:h-20 rounded-2xl text-xl font-black flex items-center justify-center transition-all active:scale-95
-                        ${key === 'CLR' || key === 'DEL' 
-                          ? 'bg-slate-100 text-slate-400 hover:bg-slate-200' 
+                        ${key === 'CLR' || key === 'DEL'
+                          ? 'bg-slate-100 text-slate-400 hover:bg-slate-200'
                           : 'bg-slate-900 text-white hover:bg-black active:bg-emerald-600 shadow-lg shadow-slate-900/5'
                         }
                       `}
@@ -149,7 +149,7 @@ export const MyProfile: React.FC = () => {
               </>
             )}
           </div>
-          <button 
+          <button
             onClick={() => navigate('/')}
             className="w-full mt-8 text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-slate-900 flex items-center justify-center space-x-2 py-4"
           >
@@ -170,18 +170,18 @@ export const MyProfile: React.FC = () => {
   return (
     <Layout role="member">
       <div className="md:max-w-md mx-auto space-y-6 pb-32">
-        
+
         {/* Profile Card */}
         <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 relative overflow-hidden group">
           <div className={`absolute top-0 right-0 w-32 h-32 ${beltColors.bg} opacity-10 blur-3xl rounded-full -mr-10 -mt-10`}></div>
-          
+
           <div className="flex items-center space-x-5 mb-8 relative z-10">
             <div className={`w-20 h-20 rounded-3xl ${beltColors.bg} flex items-center justify-center text-3xl font-black text-white ${beltColors.shadow} shadow-lg overflow-hidden border-4 border-white`}>
-               {currentMember.faceImages && currentMember.faceImages.length > 0 ? (
-                 <img src={currentMember.faceImages[0]} className="w-full h-full object-cover" />
-               ) : (
-                 <span>{currentMember.name[0]}</span>
-               )}
+              {currentMember.faceImages && currentMember.faceImages.length > 0 ? (
+                <img src={currentMember.faceImages[0]} className="w-full h-full object-cover" />
+              ) : (
+                <span>{currentMember.name[0]}</span>
+              )}
             </div>
             <div>
               <h2 className="text-3xl font-black italic text-slate-900">{currentMember.name}</h2>
@@ -192,51 +192,51 @@ export const MyProfile: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Total Classes</p>
-                <p className="text-2xl font-black text-slate-900 italic">{myAttendance.length}</p>
-             </div>
-             <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Mat Time</p>
-                <p className="text-2xl font-black text-slate-900 italic">{totalTrainingHours} <span className="text-sm text-slate-400 not-italic">hrs</span></p>
-             </div>
+            <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Total Classes</p>
+              <p className="text-2xl font-black text-slate-900 italic">{myAttendance.length}</p>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100">
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Mat Time</p>
+              <p className="text-2xl font-black text-slate-900 italic">{totalTrainingHours} <span className="text-sm text-slate-400 not-italic">hrs</span></p>
+            </div>
           </div>
         </div>
 
         {/* Status Cards Grid */}
         <div className="grid grid-cols-2 gap-4">
-           {/* Tickets Card */}
-           <div className="bg-slate-900 text-white p-6 rounded-[32px] shadow-lg shadow-slate-900/10 flex flex-col justify-between h-40 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -mr-6 -mt-6"></div>
-              <div>
-                <i className="fas fa-ticket text-slate-500 text-xl mb-2"></i>
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Remaining</p>
-              </div>
-              <div>
-                <p className="text-4xl font-black italic tracking-tighter">{currentMember.remainingTickets}</p>
-                <p className="text-[10px] text-slate-500 font-medium">out of {currentMember.totalTickets} tickets</p>
-              </div>
-           </div>
+          {/* Tickets Card */}
+          <div className="bg-slate-900 text-white p-6 rounded-[32px] shadow-lg shadow-slate-900/10 flex flex-col justify-between h-40 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -mr-6 -mt-6"></div>
+            <div>
+              <i className="fas fa-ticket text-slate-500 text-xl mb-2"></i>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Remaining</p>
+            </div>
+            <div>
+              <p className="text-4xl font-black italic tracking-tighter">{currentMember.remainingTickets}</p>
+              <p className="text-[10px] text-slate-500 font-medium">out of {currentMember.totalTickets} tickets</p>
+            </div>
+          </div>
 
-           {/* Face ID Card */}
-           <button 
-             onClick={() => setIsFaceModalOpen(true)}
-             className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex flex-col justify-between h-40 relative overflow-hidden group hover:border-blue-200 transition-colors text-left"
-           >
-              <div className="absolute right-3 top-3 w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-xs">
-                <i className="fas fa-expand"></i>
-              </div>
-              <div>
-                <i className="fas fa-fingerprint text-blue-500 text-xl mb-2"></i>
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Security</p>
-              </div>
-              <div>
-                <p className="text-lg font-black text-slate-900 leading-tight">Biometric<br/>Data</p>
-                <p className="text-[10px] text-emerald-500 font-bold mt-2 flex items-center">
-                  <i className="fas fa-check-circle mr-1"></i> Registered
-                </p>
-              </div>
-           </button>
+          {/* Face ID Card */}
+          <button
+            onClick={() => setIsFaceModalOpen(true)}
+            className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex flex-col justify-between h-40 relative overflow-hidden group hover:border-blue-200 transition-colors text-left"
+          >
+            <div className="absolute right-3 top-3 w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-xs">
+              <i className="fas fa-expand"></i>
+            </div>
+            <div>
+              <i className="fas fa-fingerprint text-blue-500 text-xl mb-2"></i>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Security</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-slate-900 leading-tight">Biometric<br />Data</p>
+              <p className="text-[10px] text-emerald-500 font-bold mt-2 flex items-center">
+                <i className="fas fa-check-circle mr-1"></i> Registered
+              </p>
+            </div>
+          </button>
         </div>
 
         {/* Timeline */}
@@ -245,12 +245,12 @@ export const MyProfile: React.FC = () => {
             <h3 className="text-lg font-black italic uppercase tracking-tight text-slate-900">Training Log</h3>
             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">Recent 10</span>
           </div>
-          
+
           <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
             {myAttendance.slice(0, 10).map((a, idx) => (
               <div key={a.id} className="flex items-start space-x-6 relative group">
                 <div className={`w-10 h-10 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm transition-transform group-hover:scale-110 ${idx === 0 ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-300'}`}>
-                   {idx === 0 ? <i className="fas fa-check text-xs"></i> : <i className="fas fa-circle text-[6px]"></i>}
+                  {idx === 0 ? <i className="fas fa-check text-xs"></i> : <i className="fas fa-circle text-[6px]"></i>}
                 </div>
                 <div className="flex-1 pt-1">
                   <div className="flex justify-between items-start">
@@ -272,7 +272,45 @@ export const MyProfile: React.FC = () => {
           </div>
         </div>
 
-        <button 
+        {/* Ticket History */}
+        {currentMember.ticketHistory && currentMember.ticketHistory.length > 0 && (
+          <div className="bg-white rounded-[40px] shadow-sm border border-slate-100 p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-black italic uppercase tracking-tight text-slate-900">Ticket History</h3>
+              <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">최근 5건</span>
+            </div>
+
+            <div className="space-y-3">
+              {[...currentMember.ticketHistory].reverse().slice(0, 5).map((h, idx) => (
+                <div key={h.id || idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm ${h.type === 'add' ? 'bg-emerald-100 text-emerald-600' :
+                        h.type === 'refund' ? 'bg-blue-100 text-blue-600' :
+                          'bg-slate-200 text-slate-600'
+                      }`}>
+                      <i className={`fas ${h.type === 'add' ? 'fa-plus' : h.type === 'refund' ? 'fa-undo' : 'fa-minus'}`}></i>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">
+                        {h.type === 'add' && '수강권 충전'}
+                        {h.type === 'use' && '수강권 사용'}
+                        {h.type === 'refund' && '수강권 환불'}
+                      </p>
+                      <p className="text-[10px] text-slate-500">{new Date(h.date).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-lg font-black ${h.type === 'use' ? 'text-red-500' : 'text-emerald-500'}`}>
+                      {h.type === 'use' ? '-' : '+'}{h.amount}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
           onClick={handleLogout}
           className="w-full bg-slate-100 text-slate-500 py-5 rounded-[28px] font-black text-sm uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95 mb-10"
         >
@@ -297,7 +335,7 @@ export const MyProfile: React.FC = () => {
                 <p className="text-slate-300 text-xs mt-1">이 이미지는 출석 체크 시 본인 확인 용도로만 사용됩니다.</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setIsFaceModalOpen(false)}
               className="w-full py-4 text-slate-900 font-bold uppercase tracking-widest text-xs hover:bg-slate-50 rounded-b-[28px] mt-1"
             >
