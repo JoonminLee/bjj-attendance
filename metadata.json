@@ -1,0 +1,7 @@
+{
+  "name": "OSS Jiu-Jitsu Management System",
+  "description": "A comprehensive responsive gym management system for Jiu-Jitsu academies covering Admin, Kiosk, and Member roles.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
