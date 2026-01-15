@@ -121,10 +121,11 @@ export const MemberList: React.FC = () => {
     e.preventDefault();
     if (!newMemberData.name || !newMemberData.phone) return;
 
+    const joinDate = new Date().toISOString().split('T')[0];
     const newMember = storageService.addMember({
       name: newMemberData.name,
       phone: newMemberData.phone,
-      joinDate: new Date().toISOString().split('T')[0],
+      joinDate,
       totalTickets: newMemberData.tickets,
       remainingTickets: newMemberData.tickets,
       status: 'active',
@@ -136,7 +137,10 @@ export const MemberList: React.FC = () => {
       parentPhone: newMemberData.parentPhone,
       email: newMemberData.email,
       address: newMemberData.address,
-      memo: ''
+      memo: '',
+      promotionHistory: [
+        { date: joinDate, belt: newMemberData.belt, stripes: newMemberData.stripes, note: 'Initial Registration' }
+      ]
     });
 
     setMembers(storageService.getMembers());
