@@ -6,27 +6,27 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
 
   const roles = [
-    { 
-      id: 'admin', 
-      title: '관리자 (PC)', 
-      desc: '회원 관리, 출결 현황, 통계 확인', 
-      icon: 'fa-user-shield', 
+    {
+      id: 'admin',
+      title: '관리자 (PC)',
+      desc: '회원 관리, 출결 현황, 통계 확인',
+      icon: 'fa-user-shield',
       color: 'bg-blue-600',
       path: '/admin'
     },
-    { 
-      id: 'kiosk', 
-      title: '출석 키오스크 (태블릿)', 
-      desc: '얼굴 인식 및 번호 출석 체크', 
-      icon: 'fa-tablet-alt', 
+    {
+      id: 'kiosk',
+      title: '출석 키오스크 (태블릿)',
+      desc: '얼굴 인식 및 번호 출석 체크',
+      icon: 'fa-tablet-alt',
       color: 'bg-slate-800',
       path: '/kiosk'
     },
-    { 
-      id: 'member', 
-      title: '관원 페이지 (모바일)', 
-      desc: '내 수강권 및 출결 이력 확인', 
-      icon: 'fa-user', 
+    {
+      id: 'member',
+      title: '관원 페이지 (모바일)',
+      desc: '내 수강권 및 출결 이력 확인',
+      icon: 'fa-user',
       color: 'bg-emerald-600',
       path: '/me'
     },
@@ -60,7 +60,7 @@ export const Home: React.FC = () => {
         </div>
 
         <div className="mt-16 text-center text-slate-400 text-xs uppercase tracking-widest font-semibold">
-          © 2024 OSS Jiu-Jitsu Management. Built for Web, Tablet & Mobile.
+          © 2026 Attendance Management. Built for Web, Tablet & Mobile.
         </div>
       </div>
     </div>

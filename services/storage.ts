@@ -16,6 +16,14 @@ const INITIAL_MEMBERS: Member[] = [
     totalTickets: 20,
     remainingTickets: 12,
     status: 'active',
+    belt: 'White',
+    stripes: 0,
+    promotionHistory: [
+      { date: '2023-10-01', belt: 'White', stripes: 0, note: '입관' }
+    ],
+    memo: '초기 멤버. 성실함.',
+    gender: 'Male',
+    birthDate: '1990-01-01',
     faceImages: []
   }
 ];
@@ -44,7 +52,26 @@ export const storageService = {
 
   addMember: (member: Omit<Member, 'id'>) => {
     const members = storageService.getMembers();
-    const newMember = { ...member, id: Date.now().toString() };
+    const joinDate = member.joinDate || new Date().toISOString().split('T')[0];
+    const initialBelt = (member as any).belt || 'White';
+    const initialStripes = (member as any).stripes || 0;
+
+    const newMember: Member = { 
+      ...member, 
+      id: Date.now().toString(), 
+      joinDate,
+      belt: initialBelt,
+      stripes: initialStripes,
+      memo: (member as any).memo || '',
+      parentPhone: (member as any).parentPhone || '',
+      birthDate: (member as any).birthDate || '',
+      gender: (member as any).gender || 'Male',
+      email: (member as any).email || '',
+      address: (member as any).address || '',
+      promotionHistory: [
+        { date: joinDate, belt: initialBelt, stripes: initialStripes, note: 'Initial Registration' }
+      ]
+    };
     storageService.saveMembers([...members, newMember]);
     return newMember;
   },

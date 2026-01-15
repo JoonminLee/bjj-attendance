@@ -63,20 +63,21 @@ export const Kiosk: React.FC = () => {
     setStatus('detecting');
     setDetectionStep(0);
     
-    // Simulating face detection process
+    // Instant detection attempt
+    const members = storageService.getMembers().filter(m => m.status === 'active' && m.faceImages && m.faceImages.length > 0);
+    // Simulating a slight processing time for realism, but very fast (e.g., 300ms)
     setTimeout(() => {
-      const members = storageService.getMembers().filter(m => m.status === 'active' && m.faceImages && m.faceImages.length > 0);
-      const isSuccess = members.length > 0 && Math.random() > 0.3;
+        const isSuccess = members.length > 0 && Math.random() > 0.3;
 
-      if (isSuccess) {
-        const randomMember = members[Math.floor(Math.random() * members.length)];
-        executeCheckIn(randomMember.id);
-      } else {
-        setStatus('error');
-        setMessage('얼굴 인식 실패. 번호 입력을 사용해 주세요.');
-        setTimeout(() => setStatus('idle'), 3000);
-      }
-    }, 1500);
+        if (isSuccess) {
+            const randomMember = members[Math.floor(Math.random() * members.length)];
+            executeCheckIn(randomMember.id);
+        } else {
+            // Only show error if we want to be noisy, otherwise just stay idle or silent retry
+            // For this demo, we'll silently go back to idle to keep scanning
+            setStatus('idle'); 
+        }
+    }, 300);
   };
 
   const executeCheckIn = (memberId: string) => {
@@ -186,8 +187,7 @@ export const Kiosk: React.FC = () => {
 
               {status === 'detecting' && (
                 <div className="w-full h-full flex flex-col items-center justify-center">
-                    <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-6 text-sm font-black uppercase tracking-widest text-blue-400 animate-pulse">Scanning...</p>
+                    {/* No visual noise, just the camera view focused */}
                 </div>
               )}
             </div>
@@ -280,17 +280,6 @@ export const Kiosk: React.FC = () => {
 
         {/* Status Feedback Overlays */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-50">
-          {status === 'detecting' && (
-            <div className="flex flex-col items-center mt-64">
-              <div className="flex space-x-1 mb-4">
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
-              </div>
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-blue-400 drop-shadow-lg">Cross-verifying samples</p>
-            </div>
-          )}
-
           {status === 'success' && matchedMember && (
             <div className="bg-emerald-500/90 backdrop-blur-2xl p-10 rounded-[50px] border border-emerald-400 shadow-2xl animate-in zoom-in fade-in duration-300 w-full max-w-md text-center pointer-events-auto">
               <div className="flex justify-center -mt-20 mb-6">

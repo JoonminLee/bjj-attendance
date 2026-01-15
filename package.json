@@ -1,11 +1,10 @@
-
 {
   "name": "oss-jiujitsu-system",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && npx gh-pages -d dist"
