@@ -92,17 +92,34 @@ export const MemberList: React.FC = () => {
   };
 
   const captureFace = () => {
-    if (videoRef.current && canvasRef.current && capturedImages.length < 1) {
+    if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      canvas.width = 480;
-      canvas.height = 640;
+
+      canvas.width = video.videoWidth || 480;
+      canvas.height = video.videoHeight || 640;
+
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        ctx.save();
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        setCapturedImages(prev => [...prev, dataUrl]);
-        if (capturedImages.length === 0) stopCamera();
+
+        if (isAddModalOpen) {
+          setCapturedImages([dataUrl]);
+        } else if (isEditModalOpen && editingMember) {
+          const updatedMember = { ...editingMember, faceImages: [dataUrl] };
+          setEditingMember(updatedMember);
+          storageService.updateMember(updatedMember);
+          setMembers(storageService.getMembers());
+          handleSaveFeedback();
+        }
+
+        stopCamera();
       }
     }
   };
@@ -315,6 +332,7 @@ export const MemberList: React.FC = () => {
   const closeEditModal = () => {
     setIsEditModalOpen(false);
     setEditingMember(null);
+    stopCamera();
   };
 
   const getBeltColorClass = (belt: string) => {
@@ -643,6 +661,42 @@ export const MemberList: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Face Data */}
+                    <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100">
+                      <h4 className="text-sm font-black text-slate-900 mb-6 uppercase tracking-widest"><i className="fas fa-eye mr-2 text-indigo-500"></i>Facial Recognition</h4>
+                      <div className="flex items-center space-x-8">
+                        <div className="w-32 h-40 bg-slate-100 rounded-2xl border-2 border-slate-200 overflow-hidden shadow-inner flex items-center justify-center">
+                          {isCapturing ? (
+                            <div className="relative w-full h-full bg-black">
+                              <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+                              <button type="button" onClick={captureFace} className="absolute inset-0 m-auto w-12 h-12 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white"><i className="fas fa-camera"></i></button>
+                            </div>
+                          ) : editingMember.faceImages && editingMember.faceImages.length > 0 ? (
+                            <img src={editingMember.faceImages[0]} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center">
+                              <i className="fas fa-user-circle text-3xl text-slate-300"></i>
+                              <p className="text-[8px] font-bold text-slate-400 mt-2">NO DATA</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                            {editingMember.faceImages && editingMember.faceImages.length > 0
+                              ? "이미 등록된 얼굴 데이터가 있습니다. 다시 등록하면 기존 데이터가 교체됩니다."
+                              : "출석 키오스크에서 얼굴 인식을 사용하려면 정면 사진을 등록해 주세요."}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => isCapturing ? stopCamera() : startFaceRegistration()}
+                            className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${isCapturing ? 'bg-slate-200 text-slate-600' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white'}`}
+                          >
+                            {isCapturing ? "Cancel" : editingMember.faceImages && editingMember.faceImages.length > 0 ? "Update Photo" : "Register Photo"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Tickets */}
                     <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100">
                       <div className="flex justify-between items-center mb-6">
@@ -837,6 +891,7 @@ export const MemberList: React.FC = () => {
         </div>
       )}
 
+      <canvas ref={canvasRef} className="hidden" />
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
