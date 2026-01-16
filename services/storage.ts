@@ -70,6 +70,16 @@ export const storageService = {
       address: (member as any).address || '',
       promotionHistory: [
         { date: joinDate, belt: initialBelt, stripes: initialStripes, note: 'Initial Registration' }
+      ],
+      ticketHistory: [
+        {
+          id: 'initial',
+          date: new Date().toISOString(),
+          type: 'add',
+          amount: Number(member.totalTickets || 0),
+          balance: Number(member.remainingTickets || 0),
+          note: '최초 등록'
+        }
       ]
     };
     storageService.saveMembers([...members, newMember]);
@@ -174,6 +184,51 @@ export const storageService = {
     return { deleted: record };
   },
 
+  // --- Performance Testing Helpers ---
+  generateDummyMembers: (count: number, imagePool?: string[], descriptorPool?: number[][]) => {
+    const existingMembers = storageService.getMembers();
+    const dummyMembers: Member[] = [];
+    const surnames = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
+    const names = ['철수', '영희', '민수', '지수', '태현', '서연', '도윤', '하윤', '준우', '민준'];
+
+    for (let i = 0; i < count; i++) {
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      const name = names[Math.floor(Math.random() * names.length)];
+      const id = `dummy-${Date.now()}-${i}`;
+
+      const faceImages = imagePool && imagePool.length > 0
+        ? [imagePool[i % imagePool.length]]
+        : ['mock-face-data'];
+
+      const faceDescriptor = descriptorPool && descriptorPool.length > 0
+        ? descriptorPool[i % descriptorPool.length]
+        : Array.from({ length: 128 }, () => Math.random());
+
+      dummyMembers.push({
+        id,
+        name: `${surname}${name}${i}`,
+        phone: `010-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`,
+        joinDate: new Date().toISOString().split('T')[0],
+        belt: 'White',
+        stripes: 0,
+        remainingTickets: 10,
+        totalTickets: 10,
+        status: 'active',
+        faceImages,
+        faceDescriptor,
+        promotionHistory: []
+      });
+    }
+
+    storageService.saveMembers([...existingMembers, ...dummyMembers]);
+    return dummyMembers.length;
+  },
+
+  clearDummyMembers: () => {
+    const members = storageService.getMembers().filter(m => !m.id.startsWith('dummy-'));
+    storageService.saveMembers(members);
+  },
+
   // 회원 완전 삭제
   deleteMember: (memberId: string) => {
     const members = storageService.getMembers();
@@ -200,25 +255,89 @@ export const storageService = {
 
     if (!member) throw new Error('회원을 찾을 수 없습니다.');
 
-    const newBalance = member.remainingTickets + amount;
+    const numAmount = Number(amount);
+    const newBalance = Number(member.remainingTickets) + numAmount;
+    const newTotal = Number(member.totalTickets || 0) + numAmount;
+
     const updatedMember: Member = {
       ...member,
       remainingTickets: newBalance,
-      totalTickets: member.totalTickets + amount,
+      totalTickets: newTotal,
       ticketHistory: [
         ...(member.ticketHistory || []),
         {
           id: Date.now().toString(),
           date: new Date().toISOString(),
           type: 'add',
-          amount,
+          amount: numAmount,
           balance: newBalance,
-          note: note || `수강권 ${amount}회 충전`
+          note: note || `수강권 ${numAmount}회 충전`
         }
       ]
     };
 
     storageService.updateMember(updatedMember);
     return { member: updatedMember };
+  },
+
+  manualAdjustTickets: (memberId: string, amount: number, note: string) => {
+    const members = storageService.getMembers();
+    const member = members.find(m => m.id === memberId);
+
+    if (!member) throw new Error('회원을 찾을 수 없습니다.');
+
+    const numAmount = Number(amount);
+    const newBalance = Math.max(0, Number(member.remainingTickets) + numAmount);
+
+    const updatedMember: Member = {
+      ...member,
+      remainingTickets: newBalance,
+      totalTickets: numAmount > 0 ? (Number(member.totalTickets || 0) + numAmount) : Number(member.totalTickets || 0),
+      ticketHistory: [
+        ...(member.ticketHistory || []),
+        {
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: numAmount > 0 ? 'add' : 'use',
+          amount: Math.abs(numAmount),
+          balance: newBalance,
+          note: note
+        }
+      ]
+    };
+
+    storageService.updateMember(updatedMember);
+    return updatedMember;
+  },
+
+  resizeImage: (dataUrl: string, targetSize: number = 512): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = dataUrl;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > targetSize) {
+            height *= targetSize / width;
+            width = targetSize;
+          }
+        } else {
+          if (height > targetSize) {
+            width *= targetSize / height;
+            height = targetSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = () => reject(new Error("Image processing failed"));
+    });
   }
 };

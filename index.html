@@ -1,17 +1,115 @@
-
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSS Jiu-Jitsu System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', 'Pretendard', sans-serif; }
-    </style>
-<script type="importmap">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSS Jiu-Jitsu | Smart Academy Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap');
+
+    :root {
+      --brand-primary: #2563eb;
+      --brand-secondary: #1d4ed8;
+      --brand-bg: #f8fafc;
+      --brand-accent: #eff6ff;
+      --brand-sidebar: #0f172a;
+      --brand-text: #1e293b;
+      --brand-card-bg: #ffffff;
+      --brand-border: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Outfit', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--brand-bg);
+      color: var(--brand-text);
+    }
+
+    .text-brand {
+      color: var(--brand-primary);
+    }
+
+    .border-brand {
+      border-color: var(--brand-primary);
+    }
+
+    .bg-brand-accent {
+      background-color: var(--brand-accent);
+    }
+
+    .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .text-glow-blue {
+      text-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .bg-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(180, 83, 9, 0.05);
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(180, 83, 9, 0.1);
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(180, 83, 9, 0.2);
+    }
+
+    @keyframes scan {
+
+      0%,
+      100% {
+        top: 0%;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        top: 100%;
+        opacity: 0;
+      }
+    }
+
+    .page-transition-enter {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .page-transition-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 400ms, transform 400ms;
+    }
+  </style>
+  <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
@@ -25,8 +123,10 @@
 }
 </script>
 </head>
-<body class="bg-gray-50 text-gray-900">
-    <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+
+<body class="bg-[#FAF9F6] text-slate-900 selection:bg-amber-500/20 overflow-x-hidden">
+  <div id="root"></div>
+  <script type="module" src="./index.tsx"></script>
 </body>
+
 </html>

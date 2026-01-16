@@ -23,6 +23,7 @@ export interface Member {
   address?: string;
   memo?: string; // Admin private notes
   faceImages: string[]; // Array of base64 strings for better recognition
+  faceDescriptor?: number[]; // Added for actual AI matching
   ticketHistory?: TicketHistory[]; // 수강권 변경 이력
 }
 

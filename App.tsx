@@ -7,6 +7,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { MemberList } from './pages/MemberList';
 import { AttendanceList } from './pages/AttendanceList';
 import { MyProfile } from './pages/MyProfile';
+import { Developer } from './pages/Developer';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/members" element={<MemberList />} />
       <Route path="/admin/attendance" element={<AttendanceList />} />
+      <Route path="/admin/developer" element={<Developer />} />
       <Route path="/me" element={<MyProfile />} />
     </Routes>
   );
