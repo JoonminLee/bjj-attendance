@@ -1,7 +1,8 @@
 
 import * as faceapi from 'face-api.js';
 
-const MODEL_URL = '/models';
+// @ts-ignore
+const MODEL_URL = import.meta.env.BASE_URL + 'models';
 
 let isModelsLoaded = false;
 let modelLoadingPromise: Promise<void> | null = null;
